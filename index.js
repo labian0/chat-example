@@ -20,9 +20,6 @@ io.on('connection', (socket) => {
   resetList();
   socket.on('new name', name_uuid => {
     var name = name_uuid["name"];
-    if(name=="lapuerta42"){
-      name="lorenzo";
-    }
     uuids[`${name_uuid["uuid"]}`] = name;
     io.emit('new name', name);
     console.log("uuid update: " + JSON.stringify(uuids));
@@ -32,9 +29,6 @@ io.on('connection', (socket) => {
     if(typeof uuids[msg["uuid"]] != 'undefined') {
 //permet de passer de uuid à nom (reçoit un message sous forme uuid,msg et le transforme en nom,msg en le faisant correspondre avec le json 'uuids'
 	var msg2 = {"name": uuids[String(msg["uuid"])], "msg": msg["msg"], "class": "namespan"};
-	if (msg2["name"] == "lorenzo") {
-		msg2["class"] = "lorenzonamespan";
-	};
 	io.emit('message', msg2);
   //renvoie un nouveau json
 	console.log("new message: " + JSON.stringify(msg2));

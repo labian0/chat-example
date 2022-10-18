@@ -12,7 +12,6 @@
       input:focus { outline: none; }
       button { background: #333; border: none; margin: 0.5%; border-radius: 0.3%; outline: none; color: #fff; }      
       .namespan { font-weight: bold; }
-      .lorenzonamespan { font-weight: bold; color: blue; }
       #lateraldiv { width: 15%; height: 94%; float: right; display: block; background-color: rgb(120, 120, 220); color: white;}
       #lateraldiv > li > p {margin: 1em;}
       #maindiv {width: 85%; height: 94%; overflow-y:auto; overflow-wrap: break-word;}
@@ -70,7 +69,7 @@
 
       nameform.addEventListener('submit', function(e) {
 	      e.preventDefault();
-	      name2 = nameinput.value.replaceAll(/lorenzo/gi,'').substr(0,20);
+	      name2 = nameinput.value.substr(0,20);
               nameinput.value = '';
               //fixed
        	      if (name2.replaceAll(" ", "")) {
