@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tchat</title>
+    <style>
+      html, body {width: 100%; height: 100%;}
+      body { font-family: Helvetica; margin: 0%; text-decoration: none; background-color: white; color: black;}
+      #warning { font-size: 24px; font: bold; text-align: center; }
+      #nameform { background: rgb(120, 120, 220); margin: auto; display: flex; height: 5%; width: 25%; box-sizing: border-box; }
+      #form { background: rgb(120, 120, 220); display: flex; height: 6%; width: 100%; box-sizing: border-box; }
+      input { border: none; flex-grow: 1; border-radius: 2rem; margin: 0.5%; }
+      input:focus { outline: none; }
+      button { background: #333; border: none; margin: 0.5%; border-radius: 0.3%; outline: none; color: #fff; }      
+      .namespan { font-weight: bold; }
+      .lorenzonamespan { font-weight: bold; color: blue; }
+      #lateraldiv { width: 15%; height: 94%; float: right; display: block; background-color: rgb(120, 120, 220); color: white;}
+      #lateraldiv > li > p {margin: 1em;}
+      #maindiv {width: 85%; height: 94%; overflow-y:auto; overflow-wrap: break-word;}
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages > li { padding: 0.5rem 1rem; }
+      #messages > li:nth-child(odd) { background: #efefef; }
+      #headp {font-weight: bold;}
+      #memberlist {list-style-type: none;}
+     </style>
+  </head>
+  <body>
+<p id="warning"> ATTENTION: Vous ne pouvez pas envoyer de messages avant d'avoir choisi un pseudo (1-20 caractères)</p>
+    <form id="nameform" action="">
+	<input id="nameinput" autocomplete="off" /><button>Pseudo</button>
+    </form>
+
+    <div id="lateraldiv">
+
+      <li>
+        <p id="headp">Utilisateurs connectés:</p>
+      </li>
+      <ul id="memberlist"></ul>
+
+    </div>
+    
+    <div id="maindiv">
+      
+      <ul id="messages"></ul>
+    
+    </div>
+    <form id="form" action="">
+      <input id="input" autocomplete="off" /><button>Envoyer</button>
+    </form>
+  
+  
+  <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+      let socket = io();
+
+      const uuid = Math.floor(Math.random() * 19891989);
+      let messages = document.getElementById('messages');
+      let form = document.getElementById('form');
+      let input = document.getElementById('input');
+      let warning = document.getElementById('warning');
+      let nameform = document.getElementById('nameform');
+      let nameimput = document.getElementById('nameimput');
+      let memberlist = document.getElementById('memberlist');
+      let name2;
+
+      function sendName(name){
+        let name_uuid = {"uuid": uuid, "name": name};
+		    socket.emit('new name', name_uuid);
+      }
+
+      nameform.addEventListener('submit', function(e) {
+	      e.preventDefault();
+	      name2 = nameinput.value.replaceAll(/lorenzo/gi,'').substr(0,20);
+              nameinput.value = '';
+              //fixed
+       	      if (name2.replaceAll(" ", "")) {
+                sendName(name2);
+                nameform.remove();
+                warning.remove();				
+              };
+      });
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        let msg = input.value.substr(0,200);
+        input.value = "";
+        if (msg.replaceAll(" ", "")) {
+	        let contentf = {"uuid": uuid, "msg": msg};
+                socket.emit('message', contentf);
+        };
+      });
+
+      socket.on('message', function(msg2) {
+        let li = document.createElement('li');
+	li.innerHTML = `<span class="${msg2.class}">${msg2.name}</span>: <span class="msgspan">${msg2.msg}</span>`;
+	console.log(msg2, li.textContent);
+        messages.appendChild(li);
+        document.getElementById('maindiv').scrollTo(0, document.getElementById('maindiv').scrollHeight);
+      });
+      
+      socket.on('reset list', function(){
+        memberlist.innerHTML = "";
+        if (name2){
+          sendName(name2);
+        }
+        else {console.log("name is problematic")};
+      });
+
+      socket.on('new name', function(newname){
+        let li = document.createElement('li');
+        li.innerHTML = `<p>${newname}</p>`;
+        memberlist.appendChild(li);
+      });
+
+    </script>
+  </body>
+</html>
